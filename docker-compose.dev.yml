@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  yii2-log-request-response-php:
+    container_name: "yii2-log-request-response-php"
+    hostname: "yii2-log-request-response-php"
+    build:
+      context: .
+      dockerfile: "php.dev.Dockerfile"
+    volumes:
+      - "./test-app-src:/var/www/html"
+      - "./:/package-src"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  yii2-log-request-response-nginx:
+    container_name: "yii2-log-request-response-nginx"
+    image: "nginx:1.21.6-alpine"
+    ports:
+      - "${HOST_NGINX_PORT:-8080}:80"
+    volumes:
+      - "./test-app-src:/var/www/html"
+      - "./deploy/data/nginx/root/etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "./deploy/data/nginx/root/etc/nginx/fastcgi_params:/etc/nginx/fastcgi_params"
+      - "./deploy/data/nginx/root/etc/nginx/conf.d:/etc/nginx/conf.d"
+    depends_on:
+      - "yii2-log-request-response-php"

@@ -1,0 +1,37 @@
+{
+    "name": "beter/yii2-log-request-response",
+    "description": "Yii2 component that registers event listeners for CLI and WEB apps and logs information with request and response metadata",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "keywords": [
+        "yii", "log", "logger", "yii2", "yii2 log", "yii log", "request data", "response data",
+        "yii2-log", "yii2-logger", "yii-log", "yii-logger", "log data"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Beter\\Yii2\\LogRequestResponse\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dmitry Menshikov",
+            "email": "d.menshikov@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "yiisoft/yii2": "^2.0",
+        "beter/exception-with-context": "^1.0"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    }
+}
