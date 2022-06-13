@@ -4,34 +4,18 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id' => 'basic',
+    'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['monolog', 'log' , 'logRequestResponse'],
+    'bootstrap' => ['monolog', 'log', 'logRequestResponse'],
+    'controllerNamespace' => 'app\commands',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        '@tests' => '@app/tests',
     ],
     'components' => [
-        'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'tfo0yXUd6BEeDqqfcO7HBRTalaRLIhSZ',
-        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
-        ],
-        'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-            // 'useFileTransport' to false and configure transport
-            // for the mailer to send real emails.
-            'useFileTransport' => true,
         ],
         'logRequestResponse' => [
             'class' => Beter\Yii2\LogRequestResponse\LogRequestResponseComponent::class,
@@ -45,10 +29,6 @@ $config = [
             'headersToMask' => [
                 'Cookie',
                 'x-Forwarded-for'
-            ],
-            'postParamPatternsToMask' => [
-                '/password/i',
-                '/csrf/i',
             ],
         ],
         'monolog' => [
@@ -105,30 +85,22 @@ $config = [
             ],
         ],
         'db' => $db,
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-            ],
-        ],
     ],
     'params' => $params,
+    /*
+    'controllerMap' => [
+        'fixture' => [ // Fixture generation command line.
+            'class' => 'yii\faker\FixtureController',
+        ],
+    ],
+    */
 ];
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
-    // array_unshift($config['bootstrap'], 'debug');
-    $config['bootstrap'][] = 'debug';
-
-    $config['modules']['debug'] = [
-        'class' => 'yii\debug\Module',
-        'allowedIPs' => ['*'],
-    ];
-
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
-        'allowedIPs' => ['*'],
     ];
 }
 

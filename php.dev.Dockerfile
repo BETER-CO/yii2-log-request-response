@@ -27,10 +27,12 @@ RUN set -eux; \
 COPY ./deploy/data/php/root/ /
 
 RUN set -eux; \
-    export PACKAGE_VERSION="0.0.1"; \
     export \
-      PACKAGE_URL="https://github.com/BETER-CO/yii2-log-request-response/archive/refs/tags/${PACKAGE_VERSION}.tar.gz" \
+      PACKAGE_VERSION="1.0.0" \
       PACKAGE_ARCH_NAME="yii2-log-request-response" \
+    ; \
+    export \
+      PACKAGE_URL="https://github.com/BETER-CO/${PACKAGE_ARCH_NAME}/archive/refs/tags/${PACKAGE_VERSION}.tar.gz" \
       PACKAGE_ARCH_DIR="${PACKAGE_ARCH_NAME}-${PACKAGE_VERSION}" \
     ; \
     curl -fsSL -o "/${PACKAGE_ARCH_NAME}.tar.gz" "$PACKAGE_URL"; \

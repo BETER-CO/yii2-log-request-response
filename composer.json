@@ -21,7 +21,8 @@
     "require": {
         "php": ">=7.4.0",
         "yiisoft/yii2": "^2.0",
-        "beter/exception-with-context": "^1.0"
+        "beter/exception-with-context": "^1.0",
+        "beter/yii2-beter-logging": "^1.0"
     },
     "repositories": [
         {

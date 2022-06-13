@@ -7,10 +7,10 @@ To make testing and development simple project contains `php.dev.Dockerfile` and
 You are not required to install PHP, Apache or nginx.
 
 The whole pipeline for the first setup is the following:
-1. You need to build docker image with a command `docker build -f php.dev.Dockerfile -t yii2-log-request-response:latest .`.
+1. You need to build docker image with a command `docker build -f php.dev.Dockerfile -t yii2-log-request-response-php:latest .`.
 2. After that you need to check `docker image ls` output and assure that image `yii2-log-request-response:latest` was built.
 3. Create docker container with the command
-`docker create --name yii2-log-request-response-php-tmp-for-copy yii2-log-request-response-php:latest`.
+`docker create --name yii2-log-request-response-php-tmp-for-copy yii2-log-request-response:latest`.
 *But don't launch docker container!* You need the container only for file copying.
 4. Copy the content of the `/var/www/html` folder from the container to the host machine. Run it from the root path
 of this repository - `docker cp -L yii2-log-request-response-php-tmp-for-copy:/var/www/html test-app-src`.
