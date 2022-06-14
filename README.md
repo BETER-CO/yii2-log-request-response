@@ -13,7 +13,7 @@ composer require beter/yii2-log-request-response
 or add
 
 ```
-"beter/yii2-beter-loging": "~1.0.0" // put the latest version here
+"beter/yii2-log-request-response": "~1.0.0" // put the latest version here
 ```
 
 to the require section of your composer.json.
