@@ -18,6 +18,7 @@
     "yiisoft/yii2": "~2.0.14",
     "yiisoft/yii2-bootstrap4": "~2.0.0",
     "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+    "beter/yii2-beter-logging": "^2",
     "beter/yii2-log-request-response": "dev-main"
   },
   "require-dev": {

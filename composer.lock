@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9596c157a7db6e3a6fc132e4a2c0f9ab",
+    "content-hash": "97171435004fefd7c44181b7a022d7f8",
     "packages": [
         {
             "name": "beter/exception-with-context",
@@ -57,19 +57,20 @@
         },
         {
             "name": "beter/yii2-beter-logging",
-            "version": "1.2.2",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BETER-CO/yii2-beter-logging.git",
-                "reference": "29eaa745cd38f7136955e091ddef033dbb1ecb09"
+                "reference": "912a81a03ed1d312b8c91a346296256b74523409"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BETER-CO/yii2-beter-logging/zipball/29eaa745cd38f7136955e091ddef033dbb1ecb09",
-                "reference": "29eaa745cd38f7136955e091ddef033dbb1ecb09",
+                "url": "https://api.github.com/repos/BETER-CO/yii2-beter-logging/zipball/912a81a03ed1d312b8c91a346296256b74523409",
+                "reference": "912a81a03ed1d312b8c91a346296256b74523409",
                 "shasum": ""
             },
             "require": {
+                "beter/exception-with-context": "^1.0",
                 "monolog/monolog": "^2",
                 "php": ">=7.2.5",
                 "psr/log": "^1",
@@ -78,7 +79,7 @@
             "type": "yii2-extension",
             "autoload": {
                 "psr-4": {
-                    "Beter\\Yii2BeterLogging\\": "src/"
+                    "Beter\\Yii2\\Logging\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -110,9 +111,9 @@
             ],
             "support": {
                 "issues": "https://github.com/BETER-CO/yii2-beter-logging/issues",
-                "source": "https://github.com/BETER-CO/yii2-beter-logging/tree/1.2.2"
+                "source": "https://github.com/BETER-CO/yii2-beter-logging/tree/2.0.0"
             },
-            "time": "2022-06-08T13:12:47+00:00"
+            "time": "2022-06-14T06:29:23+00:00"
         },
         {
             "name": "bower-asset/inputmask",

@@ -355,7 +355,7 @@ class LogRequestResponseComponent extends Component
 
         foreach ($sanitized as $name => $value) {
             // for small arrays in_array is faster than isset
-            if (in_array($name, $this->headersToMask)) {
+            if (isset($this->headersToMask[$name])) {
                 $sanitized[$name] = static::MASKED;
                 continue;
             }

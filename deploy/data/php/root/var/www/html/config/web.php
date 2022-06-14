@@ -52,7 +52,7 @@ $config = [
             ],
         ],
         'monolog' => [
-            'class' => Beter\Yii2BeterLogging\MonologComponent::class,
+            'class' => Beter\Yii2\Logging\MonologComponent::class,
             'channels' => [
                 'main' => [
                     'handler' => [
@@ -67,18 +67,25 @@ $config = [
                                 'colorize' => true,
                                 'indentSize' => 4,
                                 'trace_depth' => 10,
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
-                ],
-                'processor' => [
-                    [
-                        'name' => 'basic_processor',
-                        'env' => YII_ENV, // dev, prod, etc
-                        'app' => 'myapp',
-                        'service' => 'api',
-                        'host' => gethostname(), // or set it as you want
-                    ]
+                    'processor' => [
+                        [
+                            'name' => 'basic_processor',
+                            'env' => YII_ENV, // dev, prod, etc
+                            'app' => 'myapp',
+                            'service' => 'myservice',
+                            'exec_type' => 'web',
+                            'host' => gethostname(), // or set it as you want
+                        ],
+                        [
+                            'name' => 'correlation_id_processor',
+                            'length' => 32,
+                            'search_in_headers' => true,
+                            'header_name' => 'X-Request-Id',
+                        ],
+                    ],
                 ],
             ],
         ],
@@ -87,7 +94,7 @@ $config = [
             'flushInterval' => 1,
             'targets'       => [
                 'monolog-proxy'      => [
-                    'class'          => Beter\Yii2BeterLogging\ProxyLogTarget::class,
+                    'class'          => Beter\Yii2\Logging\ProxyLogTarget::class,
                     'targetLogComponent' => [
                         'componentName' => 'monolog',
                         'logChannel' => 'main'
