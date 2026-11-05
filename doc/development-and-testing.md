@@ -1,5 +1,31 @@
 # exception-with-context: Development end testing
 
+## PHP 8.5 runtime checks
+
+The `php-runtime` Docker target provides PHP 8.5, Composer 2, Xdebug 3.5+, Intl, and ZIP
+without installing the example application. It uses PHP's development configuration with
+`E_ALL`, including deprecation reporting.
+
+Run these commands from the repository root:
+
+```bash
+docker build --target php-runtime -f php.dev.Dockerfile \
+  -t yii2-log-request-response-php:8.5-runtime .
+
+docker run --rm --network none -e XDEBUG_MODE=off \
+  -v "$PWD:/package-src:ro" -w /package-src \
+  yii2-log-request-response-php:8.5-runtime \
+  sh -ec 'php -v; composer --version; php-fpm -t; find src -name "*.php" -exec php -l {} \;; composer validate --no-check-publish'
+```
+
+The repository is mounted read-only. These checks validate the runtime, PHP-FPM configuration,
+source syntax, and Composer metadata; they do not exercise application logging or install
+package dependencies. `XDEBUG_MODE=off` disables debugging for these command-line checks.
+
+The full example-app build described below still needs dependency updates: its old BrowserKit
+constraint rejects PHP 8.5, and the downloaded package tag `1.0.0` requires logging version 1.x
+while the example requires 2.x. Use the runtime target for now.
+
 ## Launch it
 
 To make testing and development simple project contains `php.dev.Dockerfile` and `docker-compose.dev.yml`.

@@ -1,30 +1,33 @@
-FROM php:7.4.29-fpm-alpine3.15
+FROM php:8.5-fpm-alpine AS php-runtime
 
-COPY --from=mlocati/php-extension-installer:1.5.14 /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=mlocati/php-extension-installer:2 /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 RUN set -eux; \
     rm /usr/local/etc/php-fpm.conf \
        /usr/local/etc/php-fpm.conf.default \
-       /usr/local/etc/php/php.ini-development \
-       /usr/local/etc/php/php.ini-production \
     ; \
     rm -rf /usr/local/etc/php-fpm.d
 
 RUN set -eux; \
-    export \
-      XDEBUG_VERSION=3.1.4 \
-      COMPOSER_VERSION=2.3.5 \
-    ; \
     install-php-extensions \
-      xdebug-${XDEBUG_VERSION} \
+      xdebug-^3.5 \
       intl \
-      @composer-${COMPOSER_VERSION} \
+      zip \
     ;
+
+COPY ./deploy/data/php/root/usr/local/etc/ /usr/local/etc/
+
+# Use PHP 8.5 defaults and expose deprecations during development.
+RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+# Build with --target php-runtime to check the package without the example app.
+FROM php-runtime AS development
 
 RUN set -eux; \
     composer -n create-project --prefer-dist yiisoft/yii2-app-basic .
 
-COPY ./deploy/data/php/root/ /
+COPY ./deploy/data/php/root/var/www/html/ /var/www/html/
 
 RUN set -eux; \
     export \
