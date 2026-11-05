@@ -1,6 +1,5 @@
 services:
   yii2-log-request-response-php:
-    image: "yii2-log-request-response-php:8.5-dev"
     build:
       context: .
       dockerfile: "php.dev.Dockerfile"

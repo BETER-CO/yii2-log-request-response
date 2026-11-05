@@ -1,4 +1,4 @@
-# exception-with-context: Development end testing
+# Development and testing
 
 ## PHP 8.5 runtime checks
 
@@ -22,82 +22,92 @@ The repository is mounted read-only. These checks validate the runtime, PHP-FPM 
 source syntax, and Composer metadata; they do not exercise application logging or install
 package dependencies. `XDEBUG_MODE=off` disables debugging for these command-line checks.
 
-The full example-app build described below still needs dependency updates: its old BrowserKit
-constraint rejects PHP 8.5, and the downloaded package tag `1.0.0` requires logging version 1.x
-while the example requires 2.x. Use the runtime target for now.
+## Run the example application
 
-## Launch it
+Install Docker with the Compose v2 plugin. PHP, Composer, and Nginx run in containers.
+From the repository root:
 
-To make testing and development simple project contains `php.dev.Dockerfile` and `docker-compose.dev.yml`.
-
-You are not required to install PHP, Apache or nginx.
-
-The whole pipeline for the first setup is the following:
-1. You need to build docker image with a command `docker build -f php.dev.Dockerfile -t yii2-log-request-response-php:latest .`.
-2. After that you need to check `docker image ls` output and assure that image `yii2-log-request-response:latest` was built.
-3. Create docker container with the command
-`docker create --name yii2-log-request-response-php-tmp-for-copy yii2-log-request-response:latest`.
-*But don't launch docker container!* You need the container only for file copying.
-4. Copy the content of the `/var/www/html` folder from the container to the host machine. Run it from the root path
-of this repository - `docker cp -L yii2-log-request-response-php-tmp-for-copy:/var/www/html test-app-src`.
-5. Delete container for copying `docker rm -f yii2-log-request-response-php-tmp-for-copy`.
-6. Run containers after that. `docker-compose -f docker-compose.dev.yml -p yii2-log-request-response up`.
-
-> `docker-compose` without `--build` flag will not rebuild the Docker image created with `docker build`. Add this flag
-> if yuu need rebuild image after initial launch.
-
-`docker-compose` will mount all necessary volumes to make it possible develop and debug application.
-
-> By default, nginx listens port 8080. You may change this port by specifying environment variable `HOST_NGINX_PORT`.
-> For example, to run nginx on port 8280 run
-> `HOST_NGINX_PORT=8280 docker-compose -f docker-compose.dev.yml -p yii2-log-request-response up`
-
-`docker-compose` will run in foreground, so you will see `stderr` logs and may test this application.
-If you want you may run containers in a background mode (add `-d` option after `docker-compose up`).
-
-
-### Recreation of containers
-
-If you want to update repository and recreate docker image, for example, if new version of `test-app` was released,
-you can remove the whole `test-app-src` folder and redo all the steps in the ["Launch it"](#launch-it) section.
-
-### Explanation
-
-1`composer`, `xdebug` and all needed extensions are installed during the Docker build phase.
-2. `composer` installs `yii` boilerplate project.
-3. Next step in the build pipeline copies custom files from the repo
-   (`deploy/data/php/root/var/www/html`) to the image.
-4. Custom files contains php scripts and updated `composer.json`, so `composer update` will be executed.
-5. Custom `composer.json` specifies `"beter/yii2-log-request-response": "dev-main"` and symlinks `/package-src` folder
-   in the container with the `beter/yii2-log-request-response` package. This requires to mount volume later, but gives 
-   possibility to change source files right in the `src/` folder on the host machine and immediately see that changes inside running
-   container.
-6. Folder `test-app-src` is included to `.gitignore`, so it must not bother you.
-
-> Note. Windows users must
-> [allow creation of symlinks](https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/create-symbolic-links).
-
-## Play
-
-Open `http://localhost:8080/test/index` (or specify custom part as it was specified in `HOST_NGINX_PORT` env var).
-
-## Tips
-
-If you want to test specific version of the package you have 2 options:
-* just edit `composer.json` before the docker build and replace `"beter/yii2-log-request-response": "dev-main"` to specific version.
-* after the build phase change `"beter/exception-with-context": "dev-main"` inside running container and run `composer update`.
-
-## Development and testng pipeline
-
-You may use `xdebug` to test the application,
-check settings (`deploy/data/php/root/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini`).
-
-For cli debugging your IDE may require to run commands with `PHP_IDE_CONFIG` env variable. For example,
-
-```
-PHP_IDE_CONFIG="serverName=localhost" php script.php
+```bash
+docker compose -f docker-compose.dev.yml up --build -d
+docker compose -f docker-compose.dev.yml logs -f
 ```
 
-`nginx` and `php` write their logs directly to `stderr` of the container. The project is about logging, so you definitely
-need to read `stderr`. But yii's default configuration writes logs to files, so you may also check
-`var/www/html/runtime/logs/app.log` file on the container.
+Open <http://localhost:8080/test/index>. Submit the form to exercise POST body masking.
+The CSRF token, the `csrf-demo` value, and `user[password]` should be logged as
+`[Masked]`; `user[username]` should remain visible. The root URL opens the same
+test page. Requests are logged as guests; the example has no authentication flow.
+
+To change the local port, use
+`HOST_NGINX_PORT=8280 docker compose -f docker-compose.dev.yml up -d`.
+
+Run the CLI example:
+
+```bash
+docker compose -f docker-compose.dev.yml exec -e XDEBUG_MODE=off \
+  yii2-log-request-response-php php yii test/index
+```
+
+Look for `Incoming request` / `Outgoing response` in the PHP service logs and
+`CLI command start` / `CLI command end` in the command output. These are manual
+examples, with no automated test suite.
+
+## Source and dependencies
+
+The image copies the self-contained example from `deploy/data/php/root/var/www/html`
+and installs that directory's committed Composer lock file. It does not generate a
+Yii Basic application or install template dependencies.
+
+Stable releases are used except for this package, which uses the local Composer path repository.
+The library itself still supports PHP 7.4 and later.
+
+During the build, `composer.json` and `src/` from this checkout are copied into
+`/package-src`. At runtime, Compose mounts this repository read-only at that path.
+The example uses a Composer symlink to it, so edits to `src/` take effect immediately.
+It does not download a published release of this package.
+
+The PHP service initializes a shared `test-app` Docker volume with the example app,
+including its dependencies. Nginx mounts the same volume read-only. No manual
+container creation or copy to `test-app-src` is required. An old `test-app-src`
+directory from the previous setup is no longer used and can be kept or removed.
+
+To update example dependencies and its tracked lock file:
+
+```bash
+docker compose -f docker-compose.dev.yml run --rm --no-deps \
+  --user "$(id -u):$(id -g)" -e XDEBUG_MODE=off -e COMPOSER_HOME=/tmp/composer \
+  -v "$PWD/deploy/data/php/root/var/www/html:/example" -w /example \
+  yii2-log-request-response-php \
+  composer update --no-install --no-scripts --no-interaction --prefer-dist
+```
+
+Review the lock-file changes, then rebuild and recreate the example volume as below.
+
+## Rebuild and stop
+
+Package source edits take effect through the bind mount. After changing the example
+files, its dependencies, or the Dockerfile, recreate the example volume so it receives
+the rebuilt image's application:
+
+```bash
+docker compose -f docker-compose.dev.yml down --volumes
+docker compose -f docker-compose.dev.yml up --build -d
+```
+
+`down --volumes` deletes the generated example application and its runtime files.
+It does not delete the repository. To stop the environment while preserving those
+files, omit `--volumes`.
+
+## Debugging
+
+Xdebug is available for web and CLI debugging. Its settings are in
+`deploy/data/php/root/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini`.
+It connects to `host.docker.internal:9000`. For a CLI session:
+
+```bash
+docker compose -f docker-compose.dev.yml exec \
+  -e PHP_IDE_CONFIG=serverName=localhost \
+  yii2-log-request-response-php php yii test/index
+```
+
+PHP uses its development defaults with `E_ALL`. Keep deprecation reporting enabled
+when checking compatibility.
