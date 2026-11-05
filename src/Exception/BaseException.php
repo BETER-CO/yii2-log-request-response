@@ -12,7 +12,7 @@ class BaseException extends ExceptionWithContext
      *   processing
      * @param \Throwable|null $previous previous Throwable (https://php.net/manual/en/throwable.getprevious.php)
      */
-    public function __construct($message = "", array $context = [], \Throwable $previous = null)
+    public function __construct($message = "", array $context = [], ?\Throwable $previous = null)
     {
         parent::__construct($message, 0, $previous, $context);
     }

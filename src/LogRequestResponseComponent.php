@@ -143,7 +143,7 @@ class LogRequestResponseComponent extends Component
                 );
             }
 
-            if (@preg_match($postParamPattern, null) === false) {
+            if (@preg_match($postParamPattern, '') === false) {
                 throw new ConfigurationException(
                     'postParamPatternsToMask must be an array of valid regex strings',
                     ['postParamPatternsToMask' => $postParamPatternsToMask]
