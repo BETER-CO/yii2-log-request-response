@@ -1,36 +1,29 @@
 <?php
 
+use yii\helpers\Html;
+
 /** @var yii\web\View $this */
-
-$this->title = 'My Yii Application';
 ?>
-<div class="site-index">
-    <div class="body-content">
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Request and response logging</title>
+</head>
+<body>
+    <h1>Request and response logging</h1>
+    <p>Check the PHP service logs for this request and response.</p>
+    <p>Submit the form to check masking of nested passwords and CSRF values.</p>
 
-        <div class="row">
-            <div class="col-lg-12">
-                <h2>Web request/response test.</h2>
-
-                <p>
-                    You already did the request, so check stderr output and find all information you need.
-                </p>
-
-                <p>
-                    You may test POST request with bodyParams (password, csrf) to test sanitize function.
-                    Even if you see BadRequestHttpException you may see logged data and masked POST params.
-                </p>
-
-                <p><a class="btn btn-outline-secondary" href="<?php echo \yii\helpers\Url::to(['test/post']) ?>">Test POST request</a></p>
-
-                <form action="" method="post">
-                    <input type='hidden' name='_csrf-main' value='secret data!'>
-                    <input type='hidden' name='login-button' value='button no 1'>
-                    <input type='hidden' name='LoginForm[username]' value='user1'>
-                    <input type='hidden' name='LoginForm[password]' value='password of the user'>
-                    <input type="submit" value="Test POST">
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
+    <?= Html::beginForm(['test/index'], 'post') ?>
+        <input type="hidden" name="csrf-demo" value="example CSRF secret">
+        <p>
+            <label>Username <input name="user[username]" value="test-user"></label>
+        </p>
+        <p>
+            <label>Password <input type="password" name="user[password]" value="example password"></label>
+        </p>
+        <button type="submit">Test POST logging</button>
+    <?= Html::endForm() ?>
+</body>
+</html>
