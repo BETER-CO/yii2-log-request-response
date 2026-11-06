@@ -367,12 +367,13 @@ class LogRequestResponseComponent extends Component
 
         foreach ($headers as $headerName => $headerValues) {
             // yii allows to set few header values for the same header name O_o
-            if (count($headerValues) > 1) {
+            $cnt = count($headerValues);
+            if ($cnt > 1) {
                 $duplicatedHeaders = true;
             }
 
             // process only the first value
-            $flatArray[$headerName] = $headerValues[0] ?? $headerValues;
+            $flatArray[$headerName] = $cnt === 1 ? $headerValues[0] : '';
         }
 
         if ($duplicatedHeaders) {
