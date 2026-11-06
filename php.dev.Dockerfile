@@ -16,7 +16,10 @@ RUN set -eux; \
       zip \
     ;
 
-COPY ./deploy/data/php/root/usr/local/etc/ /usr/local/etc/
+COPY ./deploy/php/php.ini /usr/local/etc/php/php.ini
+COPY ./deploy/php/conf.d/ /usr/local/etc/php/conf.d/
+COPY ./deploy/php/php-fpm.conf /usr/local/etc/php-fpm.conf
+COPY ./deploy/php/php-fpm.d/ /usr/local/etc/php-fpm.d/
 
 # Use PHP 8.5 defaults and expose deprecations during development.
 RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
@@ -24,7 +27,7 @@ RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 # Build with --target php-runtime to check the package without the example app.
 FROM php-runtime AS development
 
-COPY ./deploy/data/php/root/var/www/html/ /var/www/html/
+COPY ./deploy/example/ /var/www/html/
 COPY ./composer.json /package-src/composer.json
 COPY ./src/ /package-src/src/
 

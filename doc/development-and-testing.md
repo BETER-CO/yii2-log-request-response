@@ -53,7 +53,7 @@ examples, with no automated test suite.
 
 ## Source and dependencies
 
-The image copies the self-contained example from `deploy/data/php/root/var/www/html`
+The image copies the self-contained example from `deploy/example`
 and installs that directory's committed Composer lock file. It does not generate a
 Yii Basic application or install template dependencies.
 
@@ -75,7 +75,7 @@ To update example dependencies and its tracked lock file:
 ```bash
 docker compose -f docker-compose.dev.yml run --rm --no-deps \
   --user "$(id -u):$(id -g)" -e XDEBUG_MODE=off -e COMPOSER_HOME=/tmp/composer \
-  -v "$PWD/deploy/data/php/root/var/www/html:/example" -w /example \
+  -v "$PWD/deploy/example:/example" -w /example \
   yii2-log-request-response-php \
   composer update --no-install --no-scripts --no-interaction --prefer-dist
 ```
@@ -100,7 +100,7 @@ files, omit `--volumes`.
 ## Debugging
 
 Xdebug is available for web and CLI debugging. Its settings are in
-`deploy/data/php/root/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini`.
+`deploy/php/conf.d/docker-php-ext-xdebug.ini`.
 It connects to `host.docker.internal:9000`. For a CLI session:
 
 ```bash
