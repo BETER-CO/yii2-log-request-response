@@ -1,46 +1,21 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
-
 $config = [
-    'id' => 'basic',
+    'id' => 'log-request-response-web',
+    'defaultRoute' => 'test/index',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['monolog', 'log' , 'logRequestResponse'],
-    'aliases' => [
-        '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
-    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'tfo0yXUd6BEeDqqfcO7HBRTalaRLIhSZ',
+            'cookieValidationKey' => '',
         ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-        ],
+        // The request logger reads user status; this example always logs guests.
         'user' => [
-            'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
-        'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
-            // send all mails to a file by default. You have to set
-            // 'useFileTransport' to false and configure transport
-            // for the mailer to send real emails.
-            'useFileTransport' => true,
+            'class' => app\components\GuestUser::class,
         ],
         'logRequestResponse' => [
             'class' => Beter\Yii2\LogRequestResponse\LogRequestResponseComponent::class,
-            'excludedRoutes' => [
-                'debug/default/toolbar',
-                'debug/default/view',
-                'debug/default/index',
-                'debug/default/db-explain',
-            ],
             'maxHeaderValueLength' => 256,
             'headersToMask' => [
                 'Cookie',
@@ -111,7 +86,6 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
@@ -119,24 +93,6 @@ $config = [
             ],
         ],
     ],
-    'params' => $params,
 ];
-
-if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
-    // array_unshift($config['bootstrap'], 'debug');
-    $config['bootstrap'][] = 'debug';
-
-    $config['modules']['debug'] = [
-        'class' => 'yii\debug\Module',
-        'allowedIPs' => ['*'],
-    ];
-
-    $config['bootstrap'][] = 'gii';
-    $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
-        'allowedIPs' => ['*'],
-    ];
-}
 
 return $config;
