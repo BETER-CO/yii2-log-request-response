@@ -18,6 +18,21 @@ or add
 
 to the require section of your composer.json.
 
+## Masking query parameters
+
+Configure `queryParamPatternsToMask` with regular expressions matching sensitive query
+parameter names:
+
+```php
+'logRequestResponse' => [
+    'class' => \Beter\Yii2\LogRequestResponse\LogRequestResponseComponent::class,
+    'queryParamPatternsToMask' => ['/token/i', '/^api_key$/i'],
+],
+```
+
+Matching values are replaced with URL-encoded `[Masked]` in both request and response
+log URLs. The default is an empty array, which leaves query parameters unchanged.
+
 ## Further reading
 
 * [Development and testing](doc/development-and-testing.md)

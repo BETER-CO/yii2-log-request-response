@@ -60,6 +60,13 @@ class LogRequestResponseComponent extends Component
     ];
 
     /**
+     * List of query param patterns to check for the masking.
+     *
+     * @var array
+     */
+    protected array $queryParamPatternsToMask = [];
+
+    /**
      * Sets the list of excluded routes for request and response logging.
      *
      * @param array $excludedRoutes array of non-empty strings
@@ -152,6 +159,36 @@ class LogRequestResponseComponent extends Component
         }
 
         $this->postParamPatternsToMask = $postParamPatternsToMask;
+
+        return $this;
+    }
+
+    /**
+     * Sets the patterns for query param names whose values will be masked in logged URLs.
+     *
+     * @param array $queryParamPatternsToMask array of non-empty regex strings
+     * @return $this
+     * @throws ConfigurationException
+     */
+    protected function setQueryParamPatternsToMask(array $queryParamPatternsToMask): self
+    {
+        foreach ($queryParamPatternsToMask as $pattern) {
+            if (!is_string($pattern) || empty($pattern)) {
+                throw new ConfigurationException(
+                    'queryParamPatternsToMask must be an array of non-empty strings',
+                    ['queryParamPatternsToMask' => $queryParamPatternsToMask]
+                );
+            }
+
+            if (@preg_match($pattern, '') === false) {
+                throw new ConfigurationException(
+                    'queryParamPatternsToMask must be an array of valid regex strings',
+                    ['queryParamPatternsToMask' => $queryParamPatternsToMask]
+                );
+            }
+        }
+
+        $this->queryParamPatternsToMask = $queryParamPatternsToMask;
 
         return $this;
     }
@@ -252,7 +289,7 @@ class LogRequestResponseComponent extends Component
             $context['user']['id'] = Yii::$app->user->getIsGuest() ? '0' : Yii::$app->user->identity->getId();
             $context['user']['username'] = Yii::$app->user->getIsGuest() ? '[guest]' : Yii::$app->user->identity->username;
             $context['request']['method'] = $request->getMethod();
-            $context['request']['absoluteUrl'] = $request->getAbsoluteUrl();
+            $context['request']['absoluteUrl'] = $this->sanitizeQueryParams($request->getAbsoluteUrl());
             $context['request']['bodyParams'] = $this->sanitizeBodyParams($request->getBodyParams());
             $context['request']['userIp'] = $request->getUserIP();
             $context['headers'] = $this->sanitizeHeaders($request->getHeaders());
@@ -279,7 +316,7 @@ class LogRequestResponseComponent extends Component
 
             $context['request'] = [
                 'method' => $request->getMethod(),
-                'absoluteUrl' => $request->getAbsoluteUrl()
+                'absoluteUrl' => $this->sanitizeQueryParams($request->getAbsoluteUrl())
             ];
 
             $context['response'] = [
@@ -421,6 +458,42 @@ class LogRequestResponseComponent extends Component
         }
 
         return $sanitized;
+    }
+
+    /**
+     * Masks matching query param values while preserving the rest of the URL.
+     */
+    protected function sanitizeQueryParams(string $url): string
+    {
+        if (empty($this->queryParamPatternsToMask)) {
+            return $url;
+        }
+
+        $fragmentParts = explode('#', $url, 2);
+        $urlParts = explode('?', $fragmentParts[0], 2);
+        if (count($urlParts) < 2) {
+            return $url;
+        }
+
+        $queryParams = explode('&', $urlParts[1]);
+        foreach ($queryParams as &$param) {
+            $parts = explode('=', $param, 2);
+            $name = urldecode($parts[0]);
+            foreach ($this->queryParamPatternsToMask as $pattern) {
+                if (preg_match($pattern, $name) === 1) {
+                    $param = $parts[0] . '=' . rawurlencode(static::MASKED);
+                    break;
+                }
+            }
+        }
+        unset($param);
+
+        return sprintf(
+            '%s?%s%s',
+            $urlParts[0],
+            implode('&', $queryParams),
+            isset($fragmentParts[1]) ? sprintf('#%s', $fragmentParts[1]) : ''
+        );
     }
 
     protected function prepareSanitizedHeaderNames(): self
