@@ -372,7 +372,7 @@ class LogRequestResponseComponent extends Component
             }
 
             // process only the first value
-            $flatArray[$headerName] = $headerValues[0];
+            $flatArray[$headerName] = $headerValues[0] ?? $headerValues;
         }
 
         if ($duplicatedHeaders) {
