@@ -15,7 +15,7 @@ use yii\helpers\Html;
     <p>Check the PHP service logs for this request and response.</p>
     <p>Submit the form to check masking of nested passwords and CSRF values.</p>
 
-    <?= Html::beginForm(['test/index'], 'post') ?>
+    <?= Html::beginForm(['test/index', 'source' => 'example-form', 'secret-token' => 'example query secret'], 'post') ?>
         <input type="hidden" name="csrf-demo" value="example CSRF secret">
         <p>
             <label>Username <input name="user[username]" value="test-user"></label>

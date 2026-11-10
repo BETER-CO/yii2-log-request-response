@@ -25,6 +25,9 @@ $config = [
                 '/password/i',
                 '/csrf/i',
             ],
+            'queryParamPatternsToMask' => [
+                '/secret-token/i',
+            ],
         ],
         'monolog' => [
             'class' => Beter\Yii2\Logging\MonologComponent::class,
