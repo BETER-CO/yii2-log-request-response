@@ -1,34 +1,32 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
-
 $config = [
-    'id' => 'basic-console',
+    'id' => 'log-request-response-web',
+    'defaultRoute' => 'test/index',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['monolog', 'log', 'logRequestResponse'],
-    'controllerNamespace' => 'app\commands',
-    'aliases' => [
-        '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
-        '@tests' => '@app/tests',
-    ],
+    'bootstrap' => ['monolog', 'log' , 'logRequestResponse'],
     'components' => [
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
+        'request' => [
+            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
+            'cookieValidationKey' => '',
+        ],
+        // The request logger reads user status; this example always logs guests.
+        'user' => [
+            'class' => app\components\GuestUser::class,
         ],
         'logRequestResponse' => [
             'class' => Beter\Yii2\LogRequestResponse\LogRequestResponseComponent::class,
-            'excludedRoutes' => [
-                'debug/default/toolbar',
-                'debug/default/view',
-                'debug/default/index',
-                'debug/default/db-explain',
-            ],
             'maxHeaderValueLength' => 256,
             'headersToMask' => [
                 'Cookie',
                 'x-Forwarded-for'
+            ],
+            'postParamPatternsToMask' => [
+                '/password/i',
+                '/csrf/i',
+            ],
+            'queryParamPatternsToMask' => [
+                '/secret-token/i',
             ],
         ],
         'monolog' => [
@@ -56,8 +54,14 @@ $config = [
                             'env' => YII_ENV, // dev, prod, etc
                             'app' => 'myapp',
                             'service' => 'myservice',
-                            'exec_type' => 'cli',
+                            'exec_type' => 'web',
                             'host' => gethostname(), // or set it as you want
+                        ],
+                        [
+                            'name' => 'correlation_id_processor',
+                            'length' => 32,
+                            'search_in_headers' => true,
+                            'header_name' => 'X-Request-Id',
                         ],
                     ],
                 ],
@@ -85,24 +89,13 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
-    ],
-    'params' => $params,
-    /*
-    'controllerMap' => [
-        'fixture' => [ // Fixture generation command line.
-            'class' => 'yii\faker\FixtureController',
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'rules' => [
+            ],
         ],
     ],
-    */
 ];
-
-if (YII_ENV_DEV) {
-    // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'gii';
-    $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
-    ];
-}
 
 return $config;

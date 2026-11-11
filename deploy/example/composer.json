@@ -1,0 +1,46 @@
+{
+  "name": "beter/yii2-log-request-response-example",
+  "description": "Manual web and CLI logging example for beter/yii2-log-request-response",
+  "type": "project",
+  "license": "BSD-3-Clause",
+  "require": {
+    "php": "~8.5.0",
+    "yiisoft/yii2": "~2.0.55",
+    "beter/yii2-beter-logging": "^2.0.2",
+    "beter/yii2-log-request-response": "dev-main"
+  },
+  "config": {
+    "process-timeout": 1800,
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "yii\\composer\\Installer::postInstall"
+    ]
+  },
+  "extra": {
+    "yii\\composer\\Installer::postInstall": {
+      "generateCookieValidationKey": [
+        "config/web.php"
+      ]
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    },
+    {
+      "type": "path",
+      "url": "/package-src",
+      "options": {
+        "symlink": true,
+        "versions": {
+          "beter/yii2-log-request-response": "dev-main"
+        }
+      }
+    }
+  ]
+}

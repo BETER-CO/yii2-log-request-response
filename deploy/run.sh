@@ -15,6 +15,7 @@ CC="\e[0m"  #  - END (marker)
 
 function help() {
   echo -e "${IC}Commands:${CC}"
+  echo -e "  ${SC}up                ${CC}- Build and start the development environment."
   echo -e "  ${SC}help              ${CC}- Show all information about available commands."
   echo -e "  ${SC}reload.nginx      ${CC}- Send reload signal to nginx"
   echo -e "  ${SC}reload.php-fpm    ${CC}- Send reload signal to php-fpm"
@@ -24,33 +25,34 @@ function help() {
 }
 
 up() {
-  docker-compose up -d
+  docker compose -f "${DOCKER_COMPOSE_FILE}" up --build -d
 }
 
 reload.nginx() {
-  docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${NGINX_SERVICE_NAME} nginx -s reload
+  docker compose -f ${DOCKER_COMPOSE_FILE} exec ${NGINX_SERVICE_NAME} nginx -s reload
 }
 
 reload.php-fpm() {
-  docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${PHP_SERVICE_NAME} sh -c 'kill -USR2 `cat /usr/local/var/run/php-fpm.pid`'
+  docker compose -f ${DOCKER_COMPOSE_FILE} exec ${PHP_SERVICE_NAME} sh -c 'kill -USR2 `cat /usr/local/var/run/php-fpm.pid`'
 }
 
 shell.nginx() {
   cmd="$@"
-  docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${NGINX_SERVICE_NAME} sh -c "$cmd"
+  docker compose -f ${DOCKER_COMPOSE_FILE} exec ${NGINX_SERVICE_NAME} sh -c "$cmd"
 }
 
 shell.php-fpm() {
   cmd="$@"
-  docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${PHP_SERVICE_NAME} sh -c "$cmd"
+  docker compose -f ${DOCKER_COMPOSE_FILE} exec ${PHP_SERVICE_NAME} sh -c "$cmd"
 }
 
 lastmodified() {
-  docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${PHP_SERVICE_NAME} sh -c "find /var/www/html -not -path '*/runtime/*' -not -path '*/web/assets/*' -not -path '*/vendor/*' -exec stat -c '%Y %n' '{}' + | sort -n"
+  docker compose -f ${DOCKER_COMPOSE_FILE} exec ${PHP_SERVICE_NAME} sh -c "find /var/www/html -not -path '*/runtime/*' -not -path '*/web/assets/*' -not -path '*/vendor/*' -exec stat -c '%Y %n' '{}' + | sort -n"
 }
 
-if [ "$(type -t $1)" = "function" ]; then
-  $@
+command="${1:-help}"
+if [ "$(type -t "$command")" = "function" ]; then
+  "$command" "${@:2}"
 else
   help
 fi
