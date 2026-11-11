@@ -6,7 +6,7 @@
   "require": {
     "php": "~8.5.0",
     "yiisoft/yii2": "~2.0.55",
-    "beter/yii2-beter-logging": "^2.0.2",
+    "beter/yii2-beter-logging": "^2.0",
     "beter/yii2-log-request-response": "dev-main"
   },
   "config": {
